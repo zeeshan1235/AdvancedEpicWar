@@ -1,64 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rail Runner Pro - Dynamic</title>
-    <style>body { margin: 0; overflow: hidden; background: #111; } canvas { display: block; }</style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>body { margin: 0; background: #333; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; } canvas { background: #000; }</style>
 </head>
 <body>
+<canvas id="game"></canvas>
 <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    // Floor (Tracks)
-    const floorGeo = new THREE.PlaneGeometry(20, 1000);
-    const floorMat = new THREE.MeshBasicMaterial({color: 0x555555, side: THREE.DoubleSide});
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = Math.PI / 2;
-    scene.add(floor);
-
-    // Dynamic Player (Blocky but animated)
-    const playerGeo = new THREE.BoxGeometry(1, 2, 1);
-    const playerMat = new THREE.MeshBasicMaterial({color: 0x0077ff});
-    const player = new THREE.Mesh(playerGeo, playerMat);
-    player.position.set(0, 1, 0);
-    scene.add(player);
-
-    // Trains (Dynamic Obstacles)
-    const trains = [];
-    function spawnTrain() {
-        const trainGeo = new THREE.BoxGeometry(2, 2, 5);
-        const trainMat = new THREE.MeshBasicMaterial({color: 0xff0000});
-        const train = new THREE.Mesh(trainGeo, trainMat);
-        train.position.set(Math.floor(Math.random()*3)*4 - 4, 1, -100);
-        scene.add(train);
-        trains.push(train);
-    }
-    setInterval(spawnTrain, 2000);
-
-    camera.position.set(0, 5, 10);
-    camera.lookAt(0, 0, -20);
-
-    function animate() {
-        requestAnimationFrame(animate);
-        
-        // Train Movement (Moving towards player)
-        trains.forEach((t, i) => {
-            t.position.z += 0.5;
-            if(t.position.z > 10) { scene.remove(t); trains.splice(i, 1); }
-        });
-
-        // Player Animation (Breathing/Running effect)
-        player.position.y = 1 + Math.sin(Date.now() * 0.01) * 0.1;
-
-        renderer.render(scene, camera);
-    }
-    animate();
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+canvas.width = 300; canvas.height = 500;
+let playerX = 140, playerY = 400, score = 0;
+function draw() {
+    ctx.clearRect(0, 0, 300, 500);
+    ctx.fillStyle = '#0f0'; ctx.fillRect(playerX, playerY, 20, 20);
+    ctx.fillStyle = '#fff'; ctx.fillText('SCORE: ' + score, 10, 20);
+    requestAnimationFrame(draw);
+}
+canvas.addEventListener('touchmove', (e) => { playerX = e.touches[0].clientX - 10; });
+draw();
 </script>
 </body>
 </html>
